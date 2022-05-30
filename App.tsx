@@ -3,11 +3,11 @@ import { StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
 
-  let name = "yodel";
+  let weather = "fuckin weather ey";
 
   return (
     <View style={styles.container}>
-      <Text>{name}</Text>
+      <Text>{weather}</Text>
       <StatusBar backgroundColor='red' />
     </View>
   );
