@@ -2,23 +2,24 @@ import { StyleSheet, Text, View, ScrollView } from 'react-native'
 import ForecastItem from './ForecastItem'
 import { useContext } from 'react'
 import WeatherContext from './WeatherContext'
+import { ConvertTime } from './Formatters'
 
 
 const TodaysForecast = () => {
 
     const { hourlyLocationData, setHourlyLocationData } = useContext(WeatherContext)
-    
 
+    
     return (
         <View style={TFStyles.TodaysForecastContainer}>
             <Text style={TFStyles.Text}>Today's Forecast</Text>
             <ScrollView
+                decelerationRate='fast'
                 contentContainerStyle={TFStyles.ForecastScroll}
                 horizontal={true}>
-                    <Text>{hourlyLocationData.cnt}</Text>
-                    {/* {hourlyLocationData.list.map(forecast  => {
-                        return <ForecastItem key={forecast.dt} time={22} temp={Math.round(forecast.main.temp)}/>
-                    })} */}
+                    {hourlyLocationData.list.map(forecast  => {
+                        return <ForecastItem key={forecast.dt} time={ConvertTime(forecast.dt)} Image={forecast.weather[0].description} temp={Math.round(forecast.main.temp)}/>
+                    })}
             </ScrollView>
         </View>
     )
@@ -31,13 +32,12 @@ const TFStyles = StyleSheet.create({
         width: '100%',
         height: 150,
         backgroundColor: 'white',
-        borderBottomWidth: 2,
-        borderColor: 'rgba(0,0,0, s0.2)'
+        borderBottomWidth: 0.5
     },
     ForecastScroll: {
         display: 'flex',
         flexDirection: 'row',
-        backgroundColor: 'red',
+        backgroundColor: 'white',
         alignItems: 'center'
     },
     Text: {

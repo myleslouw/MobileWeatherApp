@@ -615,9 +615,8 @@ export async function getLocationData<T>(city: string): Promise<WeatherData> {
 
 
 //call for getting the 3 hour dates
-export async function getHourlyData(city: string): Promise<HourlyData> {
-    const HOURLY_URL = `api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}&cnt=${NumForecasts}`
-    console.log(HOURLY_URL)
+export async function getHourlyData<T>(city: string): Promise<HourlyData> {
+    const HOURLY_URL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}&cnt=${NumForecasts}`
     return fetch(HOURLY_URL)
         .then(response => { return response.json() as Promise<HourlyData> })
         .catch(err => err.message)
