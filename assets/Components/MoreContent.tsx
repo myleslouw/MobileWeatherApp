@@ -1,53 +1,53 @@
-import { View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native'
+import { View, Text, StyleSheet, Pressable, useWindowDimensions, Dimensions } from 'react-native'
 import React, { useContext, useState, useRef } from 'react'
 import TodaysForecast from './TodaysForecast'
 import MiscItems from './MiscItems'
 import WeatherContext from './WeatherContext'
 import { ConvertExactTime, ToKPH } from './Formatters'
-import { Animated } from 'react-native'
-import { useSharedValue } from 'react-native-reanimated'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import Animated, { event, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 
 
-interface Props {
-    Top: Animated.AnimatedSubtraction
-}
 
-const MoreContent = (props: Props) => {
+const { height: SCREEN_HEIGHT } = Dimensions.get('window')
+
+const MoreContent = () => {
 
     const { locationData } = useContext(WeatherContext)
-    const vertical = useSharedValue(0)
+    const translateY = useSharedValue(0)
+    const MAX_TRANSLATE_Y = -380;
+    const MIN_TRANSLATE_Y = 0;
+    const SNAP_SPOT = -150;
 
-    //gesture handling
-    const touch = useRef(
-        new Animated.ValueXY({ x: 0, y: 0 })
-    ).current;
+    const PrevLocation = useSharedValue({y: 0})
+    const gesture = Gesture.Pan()
+    .onStart(()=> {                                 //on start it sets it to the prev location
+        PrevLocation.value = {y: translateY.value}
+    })
+    .onUpdate((event) => {                          //updates it 
+        translateY.value = event.translationY + PrevLocation.value.y
+        translateY.value = Math.max(translateY.value, MAX_TRANSLATE_Y)
+        translateY.value = Math.min(translateY.value, MIN_TRANSLATE_Y)
+    })
+    .onEnd(() => {
+        if(translateY.value > SNAP_SPOT) {
+            translateY.value = withSpring(MIN_TRANSLATE_Y, {damping: 50})
+        } else if (translateY.value < SNAP_SPOT) {
+            translateY.value = withSpring(MAX_TRANSLATE_Y, {damping: 50})
+        }
+    })
 
-    const dimensions = useWindowDimensions();
-    const BOTTOM_PANEL_SIZE = 380;  //10
+    const BottomSheetStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ translateY: translateY.value }]
+        }
+    })
 
     return (
-        <GestureHandlerRootView style={{ flex: 1 }}>
+        <GestureDetector gesture={gesture}>
+            <Animated.View style={[ContentStyles.container, BottomSheetStyle]}>
 
-            <Animated.View
-                onStartShouldSetResponder={() => true}
-                onResponderMove={(event) => {
-                    touch.setValue({
-                        x: event.nativeEvent.pageX,
-                        y: event.nativeEvent.pageY
-                    })
-                }}
-                onResponderRelease={() => {
-                    Animated.spring(touch, {
-                        toValue: {
-                            x: dimensions.width / 2,
-                            y: dimensions.height / 2 - 70,
-                        },
-                        useNativeDriver: false
-                    }).start();
-                }}
-                onResponderTerminationRequest={() => true}
-                style={[ContentStyles.container, { top: Animated.subtract(touch.y, 450) }]}>
+                <View style={ContentStyles.Line}></View>
 
                 <View style={ContentStyles.Content}>
                     <TodaysForecast />
@@ -65,14 +65,16 @@ const MoreContent = (props: Props) => {
                 </View>
 
             </Animated.View>
-        </GestureHandlerRootView>
+        </GestureDetector>
 
     )
 }
 
 const ContentStyles = StyleSheet.create({
     container: {
+        height: SCREEN_HEIGHT,
         position: 'absolute',
+        top: 300,
         width: '100%',
         backgroundColor: 'white',
         borderTopLeftRadius: 30,
@@ -81,8 +83,16 @@ const ContentStyles = StyleSheet.create({
         alignItems: 'center',
 
     },
+    Line: {
+        width: 75,
+        height: 4,
+        alignSelf: 'center',
+        backgroundColor: 'gray',
+        marginTop: 15,
+        borderRadius: 2
+    },
     Content: {
-        marginTop: 25,
+        marginTop: 15,
         width: '100%',
         alignItems: 'center',
     },

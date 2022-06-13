@@ -9,6 +9,8 @@ import MoreContent from './assets/Components/MoreContent';
 import MainTemp from './assets/Components/MainTemp';
 import WeatherContext from './assets/Components/WeatherContext';
 import { Animated } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+
 
 
 //#endregion
@@ -55,6 +57,7 @@ export default function App() {
 
 
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
 
       <WeatherContext.Provider value={{ location, setLocation, locationData, hourlyLocationData, setHourlyLocationData }}>
 
@@ -69,15 +72,13 @@ export default function App() {
           </View>
 
           <View style={styles.BottomHalfContainer}>
-            <MoreContent Top={Animated.subtract(touch.y, BOTTOM_PANEL_SIZE)} />
+            <MoreContent  />
           </View>
 
           <StatusBar backgroundColor='white' />
         </View>
-
-
       </WeatherContext.Provider>
-
+    </GestureHandlerRootView>
   );
 
 }
