@@ -1,4 +1,6 @@
-import { DrawerLayoutAndroidBase } from "react-native"
+import { useContext } from "react";
+import { Alert } from "react-native"
+import { startHourlyData, startLocationData } from "./test";
 import WeatherContext from "./WeatherContext";
 
 const apiKey = 'de6a32c46a5b665fad2644b271c0fe11'
@@ -600,7 +602,6 @@ export type HourlyData = {
 
 
 
-
 //API calls
 
 
@@ -608,7 +609,7 @@ export type HourlyData = {
 export async function getLocationData<T>(city: string): Promise<WeatherData> {
     const DEFAULT_URL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`
     return fetch(DEFAULT_URL)
-        .then(response => { return response.json() as Promise<WeatherData> })
+        .then(response => { return HandleErrors(response, false) as Promise<WeatherData> })
         .catch(err => err.message)
 }
 
@@ -618,10 +619,19 @@ export async function getLocationData<T>(city: string): Promise<WeatherData> {
 export async function getHourlyData<T>(city: string): Promise<HourlyData> {
     const HOURLY_URL = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&units=metric&appid=${apiKey}&cnt=${NumForecasts}`
     return fetch(HOURLY_URL)
-        .then(response => { return response.json() as Promise<HourlyData> })
+        .then(response => { return HandleErrors(response, true) as Promise<HourlyData> })
         .catch(err => err.message)
 }
 
-export const testCall = () => {
-    return 3
+const HandleErrors = (response: Response, hourly: boolean) => {
+    if (!response.ok) {
+        //Throw Alert then return the prev data?
+        Alert.alert('Invalid Command', "Unable to find the location", [
+            { text: 'Retry', onPress: () => console.log('Alert Closed') }
+        ])
+        return hourly ? startHourlyData : startLocationData
+    } else {
+        return response.json()
+    }
 }
+

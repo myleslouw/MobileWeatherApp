@@ -5,6 +5,9 @@ import MiscItems from './MiscItems'
 import WeatherContext from './WeatherContext'
 import { ConvertExactTime, ToKPH } from './Formatters'
 import { Animated } from 'react-native'
+import { useSharedValue } from 'react-native-reanimated'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
+
 
 interface Props {
     Top: Animated.AnimatedSubtraction
@@ -12,13 +15,8 @@ interface Props {
 
 const MoreContent = (props: Props) => {
 
-    const [expanded, setExpanded] = useState(true)
-
-    const HandleExpand = () => {
-        setExpanded(currentState => !currentState)
-    }
-
     const { locationData } = useContext(WeatherContext)
+    const vertical = useSharedValue(0)
 
     //gesture handling
     const touch = useRef(
@@ -26,41 +24,31 @@ const MoreContent = (props: Props) => {
     ).current;
 
     const dimensions = useWindowDimensions();
+    const BOTTOM_PANEL_SIZE = 380;  //10
 
     return (
-        <Animated.View
-            style={[ContentStyles.container, { top: props.Top }]}
-            onResponderStart={() => true}
-            onResponderMove={(event) => {
-                console.log("content responder")
-                touch.setValue({
-                    x: event.nativeEvent.pageX,
-                    y: event.nativeEvent.pageY
-                })
-            }}
-            onResponderRelease={() => {
-                Animated.spring(touch, {
-                    toValue: {
-                        x: dimensions.width - 500,
-                        y: dimensions.height - 500,
-                    },
-                    useNativeDriver: false
-                }).start();
-            }}
-            onResponderTerminationRequest={() => true}
-            onResponderTerminate={() => {
-                Animated.spring(touch, {
-                    toValue: {
-                        x: dimensions.width - 500,
-                        y: dimensions.height - 500,
-                    },
-                    useNativeDriver: false
-                }).start();
-            }}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
 
-            <Pressable onPress={HandleExpand}>
-            </Pressable>
-            {expanded ?
+            <Animated.View
+                onStartShouldSetResponder={() => true}
+                onResponderMove={(event) => {
+                    touch.setValue({
+                        x: event.nativeEvent.pageX,
+                        y: event.nativeEvent.pageY
+                    })
+                }}
+                onResponderRelease={() => {
+                    Animated.spring(touch, {
+                        toValue: {
+                            x: dimensions.width / 2,
+                            y: dimensions.height / 2 - 70,
+                        },
+                        useNativeDriver: false
+                    }).start();
+                }}
+                onResponderTerminationRequest={() => true}
+                style={[ContentStyles.container, { top: Animated.subtract(touch.y, 450) }]}>
+
                 <View style={ContentStyles.Content}>
                     <TodaysForecast />
                     <View style={ContentStyles.MiscContainer}>
@@ -74,9 +62,11 @@ const MoreContent = (props: Props) => {
                     <View>
                         <Text style={ContentStyles.Text}>New Headline</Text>
                     </View>
-                </View> : null}
+                </View>
 
-        </Animated.View>
+            </Animated.View>
+        </GestureHandlerRootView>
+
     )
 }
 

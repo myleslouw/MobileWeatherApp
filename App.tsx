@@ -10,6 +10,7 @@ import MainTemp from './assets/Components/MainTemp';
 import WeatherContext from './assets/Components/WeatherContext';
 import { Animated } from 'react-native';
 
+
 //#endregion
 
 export default function App() {
@@ -37,8 +38,12 @@ export default function App() {
     console.log('input: ' + newLocation)
 
     //awaits new info and changes the state to the new info
-    setLocationData(await getLocationData(newLocation))
-    setHourlyLocationData(await getHourlyData(newLocation))
+    let newData = await getLocationData(newLocation)
+    let newHourly = await getHourlyData(newLocation)
+
+
+    setLocationData(newData)
+    setHourlyLocationData(newHourly)
   }
 
   const counter = useRef(0)
@@ -51,44 +56,30 @@ export default function App() {
 
   return (
 
-    <WeatherContext.Provider value={{ location, setLocation, locationData, hourlyLocationData, setHourlyLocationData }}>
+      <WeatherContext.Provider value={{ location, setLocation, locationData, hourlyLocationData, setHourlyLocationData }}>
 
-      <View
-        onStartShouldSetResponder={() => true}
-        onResponderMove={(event) => {
-          console.log("main responder")
-          touch.setValue({
-            x: event.nativeEvent.pageX,
-            y: event.nativeEvent.pageY
-          })
-        }}
-        onResponderRelease={() => {
-          Animated.spring(touch, {
-            toValue: {
-              x: dimensions.width / 2,
-              y: dimensions.height / 2 - 70,
-            },
-            useNativeDriver: false
-          }).start();
-        }}
-        onResponderTerminationRequest={() => true}
-        style={styles.container}>
+        <View
 
-        <SearchBar Search={() => HandleSearchButton(location)} />
+          style={styles.container}>
 
-        <View style={styles.TopHalfContainer}>
-          <MainTemp CityName={locationData.name} Temp={Math.round(locationData.main.temp)} />
+          <SearchBar Search={() => HandleSearchButton(location)} />
+
+          <View style={styles.TopHalfContainer}>
+            <MainTemp CityName={locationData.name} Temp={Math.round(locationData.main.temp)} />
+          </View>
+
+          <View style={styles.BottomHalfContainer}>
+            <MoreContent Top={Animated.subtract(touch.y, BOTTOM_PANEL_SIZE)} />
+          </View>
+
+          <StatusBar backgroundColor='white' />
         </View>
 
-        <View style={styles.BottomHalfContainer}>
-          <MoreContent Top={Animated.subtract(touch.y, BOTTOM_PANEL_SIZE)} />
-        </View>
 
-        <StatusBar backgroundColor='white' />
-      </View>
+      </WeatherContext.Provider>
 
-    </WeatherContext.Provider>
   );
+
 }
 
 const styles = StyleSheet.create({
