@@ -10,6 +10,7 @@ import MainTemp from './assets/Components/MainTemp';
 import WeatherContext from './assets/Components/WeatherContext';
 import { Animated } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import LinearGradient from 'react-native-linear-gradient';
 
 
 
@@ -56,7 +57,10 @@ export default function App() {
 
       <WeatherContext.Provider value={{ location, setLocation, locationData, hourlyLocationData, setHourlyLocationData }}>
 
-        <View style={styles.container}>
+        <LinearGradient 
+         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+         colors={['#11998e', '#38ef7d']}
+         style={styles.container}>
 
           <SearchBar Search={() => HandleSearchButton(location)} />
 
@@ -69,7 +73,7 @@ export default function App() {
           </View>
 
           <StatusBar backgroundColor='white' />
-        </View>
+        </LinearGradient>
       </WeatherContext.Provider>
     </GestureHandlerRootView>
   );
