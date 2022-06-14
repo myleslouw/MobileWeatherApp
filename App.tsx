@@ -27,11 +27,6 @@ export default function App() {
     new Animated.ValueXY({ x: 0, y: 0 })
   ).current;
 
-  const BOTTOM_PANEL_SIZE = 400;
-
-  const dimensions = useWindowDimensions();
-
-
   const HandleSearchButton = (inputtedLocation: string) => {
     ChangeCity(inputtedLocation)
   }
@@ -46,6 +41,8 @@ export default function App() {
 
     setLocationData(newData)
     setHourlyLocationData(newHourly)
+
+    console.log(locationData.timezone)
   }
 
   const counter = useRef(0)
@@ -54,21 +51,17 @@ export default function App() {
     counter.current++
   })
 
-
-
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
 
       <WeatherContext.Provider value={{ location, setLocation, locationData, hourlyLocationData, setHourlyLocationData }}>
 
-        <View
-
-          style={styles.container}>
+        <View style={styles.container}>
 
           <SearchBar Search={() => HandleSearchButton(location)} />
 
           <View style={styles.TopHalfContainer}>
-            <MainTemp CityName={locationData.name} Temp={Math.round(locationData.main.temp)} />
+            <MainTemp CityName={locationData.name} Image={locationData.weather[0].description} Temp={Math.round(locationData.main.temp)} />
           </View>
 
           <View style={styles.BottomHalfContainer}>

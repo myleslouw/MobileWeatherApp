@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, Pressable, useWindowDimensions, Dimensions } from 'react-native'
-import React, { useContext, useState, useRef } from 'react'
+import { View, Text, StyleSheet, Dimensions } from 'react-native'
+import React, { useContext, useState, useRef, useCallback } from 'react'
 import TodaysForecast from './TodaysForecast'
 import MiscItems from './MiscItems'
 import WeatherContext from './WeatherContext'
 import { ConvertExactTime, ToKPH } from './Formatters'
-import Animated, { event, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
+import Animated, {  useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 
 
@@ -17,25 +17,34 @@ const MoreContent = () => {
     const translateY = useSharedValue(0)
     const MAX_TRANSLATE_Y = -380;
     const MIN_TRANSLATE_Y = 0;
-    const SNAP_SPOT = -150;
+    const CLOSE_SNAP_SPOT = -200;
+    const OPEN_SNAP_SPOT = 0;
+    const PrevLocation = useSharedValue({ y: 0 })
 
-    const PrevLocation = useSharedValue({y: 0})
+
+    const ScrollTo = useCallback((destination: number) => {                 //Snaps to top or bottom
+        'worklet';                                                          //runs on UI thread
+        translateY.value = withSpring(destination, { damping: 50 })
+    }, [])
+
     const gesture = Gesture.Pan()
-    .onStart(()=> {                                 //on start it sets it to the prev location
-        PrevLocation.value = {y: translateY.value}
-    })
-    .onUpdate((event) => {                          //updates it 
-        translateY.value = event.translationY + PrevLocation.value.y
-        translateY.value = Math.max(translateY.value, MAX_TRANSLATE_Y)
-        translateY.value = Math.min(translateY.value, MIN_TRANSLATE_Y)
-    })
-    .onEnd(() => {
-        if(translateY.value > SNAP_SPOT) {
-            translateY.value = withSpring(MIN_TRANSLATE_Y, {damping: 50})
-        } else if (translateY.value < SNAP_SPOT) {
-            translateY.value = withSpring(MAX_TRANSLATE_Y, {damping: 50})
-        }
-    })
+        .onStart(() => {                                 //on start it sets it to the prev location
+            PrevLocation.value = { y: translateY.value }
+        })
+        .onUpdate((event) => {                          //updates it 
+            translateY.value = event.translationY + PrevLocation.value.y
+            translateY.value = Math.max(translateY.value, MAX_TRANSLATE_Y)
+            translateY.value = Math.min(translateY.value, MIN_TRANSLATE_Y)
+        })
+        .onEnd(() => {
+            if (translateY.value < CLOSE_SNAP_SPOT) {        //closes if moved down 10 units
+                ScrollTo(MIN_TRANSLATE_Y)
+
+            } else if (translateY.value < OPEN_SNAP_SPOT) { //opens if moved up 10 units
+                ScrollTo(MAX_TRANSLATE_Y)
+
+            }
+        })
 
     const BottomSheetStyle = useAnimatedStyle(() => {
         return {
@@ -52,9 +61,9 @@ const MoreContent = () => {
                 <View style={ContentStyles.Content}>
                     <TodaysForecast />
                     <View style={ContentStyles.MiscContainer}>
-                        <MiscItems itemTitle='SUNRISE' itemValue={ConvertExactTime(locationData.sys.sunrise)} additional={''} />
-                        <MiscItems itemTitle='SUNSET' itemValue={ConvertExactTime(locationData.sys.sunset)} additional={''} />
-                        <MiscItems itemTitle='HUMIDITY' itemValue={50} additional={'%'} />
+                        <MiscItems itemTitle='SUNRISE' itemValue={ConvertExactTime(locationData.sys.sunrise, locationData.timezone)} additional={''} />
+                        <MiscItems itemTitle='SUNSET' itemValue={ConvertExactTime(locationData.sys.sunset, locationData.timezone)} additional={''} />
+                        <MiscItems itemTitle='HUMIDITY' itemValue={locationData.main.humidity} additional={'%'} />
                         <MiscItems itemTitle='WIND' itemValue={Math.round(ToKPH(locationData.wind.speed))} additional={'kmh'} />
                         <MiscItems itemTitle='MAX' itemValue={Math.round(locationData.main.temp_max)} additional={'°'} />
                         <MiscItems itemTitle='MIN' itemValue={Math.round(locationData.main.temp_min)} additional={'°'} />
@@ -71,6 +80,14 @@ const MoreContent = () => {
 }
 
 const ContentStyles = StyleSheet.create({
+    Line: {
+        width: 75,
+        height: 4,
+        alignSelf: 'center',
+        backgroundColor: 'gray',
+        marginTop: 15,
+        borderRadius: 2
+    },
     container: {
         height: SCREEN_HEIGHT,
         position: 'absolute',
@@ -81,20 +98,12 @@ const ContentStyles = StyleSheet.create({
         borderTopRightRadius: 30,
         display: 'flex',
         alignItems: 'center',
-
-    },
-    Line: {
-        width: 75,
-        height: 4,
-        alignSelf: 'center',
-        backgroundColor: 'gray',
-        marginTop: 15,
-        borderRadius: 2
     },
     Content: {
         marginTop: 15,
         width: '100%',
         alignItems: 'center',
+        display: 'flex'
     },
     MiscContainer: {
         width: '100%',

@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, Pressable } from 'react-native'
-
+import {ImageManager, Images} from './Formatters'
 
 interface Props {
   time: string
@@ -7,21 +7,6 @@ interface Props {
   Image: string
 }
 
-const Images: any = {
-  heavyrain: require('../Icons/Light/heavy-rain.png') as string,
-  moderaterain: require('../Icons/Light/rain.png'),
-  clearsky: require('../Icons/Light/sun.png'),
-  lightrain: require('../Icons/Light/light-rain.png'),
-  brokenclouds: require('../Icons/Light/cloud.png'),
-  scatteredclouds: require('../Icons/Light/partly-cloudy-day.png'),
-  overcastclouds: require('../Icons/Light/cloud.png'),
-  fewclouds: require('../Icons/Light/partly-cloudy-day.png'),
-}
- //returns a image for the current weather description
- const ImageManager = (description: string) => {
-  description = description.replace(/\s+/g, '');          //https://stackoverflow.com/questions/5963182/how-to-remove-spaces-from-a-string-using-javascript
-  return Images[description]
-}
 
 const ForecastItem = (props: Props) => {
   return (

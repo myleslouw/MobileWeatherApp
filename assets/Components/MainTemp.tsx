@@ -1,9 +1,11 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
+import { Images, ImageManager} from './Formatters'
 
 interface Props {
   CityName: string,
   Temp: number,
+  Image: string
 }
 
 const MainTemp = (props: Props) => {
@@ -13,7 +15,7 @@ const MainTemp = (props: Props) => {
         style={[MainTempStyles.text, { fontSize: 20 }]}
       >{props.CityName}</Text>
       <Image
-        source={require('../Icons/Light/cloud.png')}
+        source={ImageManager(props.Image)}
         style={MainTempStyles.Image} />
       <Text style={[MainTempStyles.text, { fontSize: 60 }]}> {props.Temp}°</Text>
     </View>

@@ -1,8 +1,4 @@
-import { createContext } from "react";
 import { HourlyData, WeatherData } from "./APIcalls"
-
-
-
 
 export const startLocationData: WeatherData = 
 {
@@ -48,8 +44,6 @@ export const startLocationData: WeatherData =
     "name": "Cape Town",
     "cod": 200
 }
-
-
 
 
 export const startHourlyData: HourlyData = 
