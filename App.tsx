@@ -1,16 +1,18 @@
 //#region imports
 import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Button, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import SearchBar from './assets/Components/SearchBar';
-import { getLocationData, getHourlyData, WeatherData, HourlyData } from './assets/Components/APIcalls';
+import { getLocationData, getHourlyData, } from './assets/Components/APIcalls';
 import { startLocationData, startHourlyData } from './assets/Components/test'
 import MoreContent from './assets/Components/MoreContent';
 import MainTemp from './assets/Components/MainTemp';
 import WeatherContext from './assets/Components/WeatherContext';
 import { Animated } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import LinearGradient from 'react-native-linear-gradient';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BackgroundManager } from './assets/Components/Formatters';
+import { ConvertExactTime } from './assets/Components/Formatters';
 
 
 
@@ -23,6 +25,7 @@ export default function App() {
   const [locationData, setLocationData] = useState(startLocationData)
   const [hourlyLocationData, setHourlyLocationData] = useState(startHourlyData)
 
+ 
   //gesture handling
   const touch = useRef(
     new Animated.ValueXY({ x: 0, y: 0 })
@@ -39,11 +42,9 @@ export default function App() {
     let newData = await getLocationData(newLocation)
     let newHourly = await getHourlyData(newLocation)
 
-
     setLocationData(newData)
     setHourlyLocationData(newHourly)
 
-    console.log(locationData.timezone)
   }
 
   const counter = useRef(0)
@@ -57,19 +58,21 @@ export default function App() {
 
       <WeatherContext.Provider value={{ location, setLocation, locationData, hourlyLocationData, setHourlyLocationData }}>
 
-        <LinearGradient 
-         start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
-         colors={['#11998e', '#38ef7d']}
-         style={styles.container}>
+        <LinearGradient
+          //start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}
+          colors={BackgroundManager(locationData.weather[0].description)}
+          style={styles.container}>
 
           <SearchBar Search={() => HandleSearchButton(location)} />
 
           <View style={styles.TopHalfContainer}>
             <MainTemp CityName={locationData.name} Image={locationData.weather[0].description} Temp={Math.round(locationData.main.temp)} />
+            <Text style={{color: 'white'}}>{locationData.weather[0].description}</Text>
+
           </View>
 
           <View style={styles.BottomHalfContainer}>
-            <MoreContent  />
+            <MoreContent />
           </View>
 
           <StatusBar backgroundColor='white' />
@@ -91,14 +94,14 @@ const styles = StyleSheet.create({
   TopHalfContainer: {
     flex: 1,
     width: '100%',
-    backgroundColor: 'black',
+    backgroundColor: 'rgba(52, 52, 52, 0)',
     justifyContent: 'flex-start',
     alignItems: 'center'
   },
   BottomHalfContainer: {
     flex: 1,
     width: '100%',
-    backgroundColor: 'black',
+    backgroundColor: 'rgba(52, 52, 52, 0)',
     justifyContent: 'flex-end'
   }
 });

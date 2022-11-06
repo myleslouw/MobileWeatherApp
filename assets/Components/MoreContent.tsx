@@ -4,7 +4,7 @@ import TodaysForecast from './TodaysForecast'
 import MiscItems from './MiscItems'
 import WeatherContext from './WeatherContext'
 import { ConvertExactTime, ToKPH } from './Formatters'
-import Animated, {  useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated'
 import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 
 
@@ -15,7 +15,7 @@ const MoreContent = () => {
 
     const { locationData } = useContext(WeatherContext)
     const translateY = useSharedValue(0)
-    const MAX_TRANSLATE_Y = -380;
+    const MAX_TRANSLATE_Y = -360;
     const MIN_TRANSLATE_Y = 0;
     const CLOSE_SNAP_SPOT = -200;
     const OPEN_SNAP_SPOT = 0;
@@ -68,9 +68,7 @@ const MoreContent = () => {
                         <MiscItems itemTitle='MAX' itemValue={Math.round(locationData.main.temp_max)} additional={'°'} />
                         <MiscItems itemTitle='MIN' itemValue={Math.round(locationData.main.temp_min)} additional={'°'} />
                     </View>
-                    <View>
-                        <Text style={ContentStyles.Text}>New Headline</Text>
-                    </View>
+
                 </View>
 
             </Animated.View>

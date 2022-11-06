@@ -33,7 +33,7 @@ export default SearchBar
 const styles = StyleSheet.create({
     SearchContainer: {
         height: "10%",
-        backgroundColor:'black',
+        backgroundColor:'rgba(52, 52, 52, 0)',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center'
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         height: '55%',
         width: "12%",
-        backgroundColor: 'black',
+        backgroundColor: 'rgba(52, 52, 52, 0)',
         justifyContent: 'center',
         alignItems: 'center'
     },

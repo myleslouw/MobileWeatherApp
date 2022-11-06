@@ -28,7 +28,7 @@ const MainTempStyles = StyleSheet.create({
   MainTempContainer: {
     marginTop: 60,
     width: '40%',
-    backgroundColor: 'black',
+    backgroundColor: 'rgba(52, 52, 52, 0)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
