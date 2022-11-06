@@ -1,6 +1,6 @@
 # MobileWeatherApp
 
-React Native Weather App using OpenWeatherMap's Weather API
+React Native and TypeScript Weather App using OpenWeatherMap's Weather API
 
 ![](https://github.com/myleslouw/MobileWeatherApp/blob/master/Gifs/Search.gif)
 ![](https://github.com/myleslouw/MobileWeatherApp/blob/master/Gifs/RainyPlace.gif)
